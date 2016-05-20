@@ -23,6 +23,9 @@ function HTPasswd(config, stuff) {
   // set maxusers to Infinity if not specified
   if (self._maxusers == null) self._maxusers = Infinity
 
+  self._allow_sign_up = self._config.allow_sign_up
+  if (self._allow_sign_up == null) self._allow_sign_up = true
+
   self._last_time = null
   var file = self._config.file
   if (file == null) file = self._sinopia_config.users_file
@@ -57,7 +60,9 @@ HTPasswd.prototype.adduser = function(user, password, real_cb) {
 
   function sanity_check() {
     var err = null
-    if (self._users[user]) {
+    if (self._allow_sign_up) {
+      err = Error('sign up is not allowed')
+    } else if (self._users[user]) {
       err = Error('this user already exists')
     } else if (Object.keys(self._users).length >= self._maxusers) {
       err = Error('maximum amount of users reached')
@@ -135,4 +140,3 @@ HTPasswd.prototype._reload = function(_callback) {
     })
   })
 }
-
